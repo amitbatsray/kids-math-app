@@ -713,6 +713,77 @@
     z-index: 200;
   }
 
+  /* Level-up prompt overlay */
+  .level-up-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 150;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .level-up-overlay.hidden { display: none; }
+  .level-up-prompt {
+    background: white;
+    border-radius: 28px;
+    padding: 36px 32px;
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+    animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .lup-emoji { font-size: 3.5rem; margin-bottom: 10px; }
+  .lup-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.6rem;
+    color: var(--dark);
+    margin-bottom: 10px;
+  }
+  .lup-intro {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+  .lup-changes-label {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #888;
+    margin-bottom: 8px;
+  }
+  .lup-changes-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px;
+  }
+  .lup-changes-list li {
+    background: linear-gradient(135deg, #f8f0ff, #f0f0ff);
+    border: 2px solid var(--purple);
+    border-radius: 12px;
+    padding: 8px 14px;
+    margin-bottom: 6px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--dark);
+  }
+  .lup-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .lup-accept {
+    padding: 14px;
+    font-size: 1.2rem;
+  }
+  .lup-decline {
+    padding: 12px;
+    font-size: 1rem;
+  }
+
   @media (max-width: 600px) {
     .card { padding: 25px 18px; border-radius: 24px; }
     .app-title { font-size: 1.8rem; }
@@ -727,6 +798,8 @@
     .feedback-content { padding: 12px 24px; }
     .feedback-emoji { font-size: 3rem; }
     .feedback-text { font-size: 1.2rem; }
+    .level-up-prompt { padding: 24px 18px; }
+    .lup-title { font-size: 1.3rem; }
   }
 </style>
 </head>
@@ -932,6 +1005,20 @@
   </div>
 </div>
 
+<div class="level-up-overlay hidden" id="levelUpOverlay">
+  <div class="level-up-prompt">
+    <div class="lup-emoji">🏆</div>
+    <h2 class="lup-title" id="lupTitle">Ready for a challenge?</h2>
+    <p class="lup-intro" id="lupIntro"></p>
+    <p class="lup-changes-label" id="lupChangesLabel">Here's what will change:</p>
+    <ul class="lup-changes-list" id="lupChangesList"></ul>
+    <div class="lup-buttons">
+      <button class="btn-start lup-accept" id="lupAccept">Level up! 🚀</button>
+      <button class="btn-secondary lup-decline" id="lupDecline">Stay at this level</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ==================== I18N ====================
 const I18N = {
@@ -961,30 +1048,35 @@ const I18N = {
     playerCustom: 'Player',
     showClues: 'Show clues',
     revealClue: '💡 Clue',
-    perfect: name => `PERFECT, ${name}! 🌟`,
-    outstanding: name => `Outstanding, ${name}! 🏆`,
-    greatJob: name => `Great Job, ${name}! 🎉`,
-    goodEffort: name => `Good Effort, ${name}! 😊`,
-    keepPracticing: name => `Keep Practicing, ${name}! 💪`,
-    resultMsgPerfect: name => `${name}, you are a math genius! Perfect score!`,
-    resultMsgTop: name => `${name}, you are a math wizard! Almost perfect score!`,
-    resultMsgGood: name => `Really well done, ${name}! Keep up the great work!`,
-    resultMsgOk: name => `Nice try, ${name}! A little more practice and you'll be a pro!`,
-    resultMsgLow: name => `Don't worry ${name}, practice makes perfect! Try again!`,
+    perfect: name => `Perfect score, ${name}! 🌟`,
+    outstanding: name => `Well done, ${name}! 🏆`,
+    greatJob: name => `Good job, ${name}! 🎉`,
+    goodEffort: name => `Nice effort, ${name}! 😊`,
+    keepPracticing: name => `Keep practicing, ${name}! 💪`,
+    resultMsgPerfect: name => `${name}, you got every single one right!`,
+    resultMsgTop: name => `${name}, almost a perfect score — really solid!`,
+    resultMsgGood: name => `Good work, ${name}! You're making progress.`,
+    resultMsgOk: name => `Not bad, ${name}. A bit more practice will help!`,
+    resultMsgLow: name => `Keep at it, ${name} — practice makes progress!`,
     levelUp: name => `LEVEL UP, ${name}!`,
     maxNumberTo: n => `Max number → ${n}`,
     addedOp: op => `Added ${op}`,
+    levelUpPromptTitle: 'Ready for a challenge?',
+    levelUpPromptIntro: name => `Great round, ${name}! You seem ready for the next level.`,
+    levelUpPromptChanges: 'Here\'s what will change:',
+    levelUpAccept: 'Level up! 🚀',
+    levelUpDecline: 'Stay at this level',
     answer: a => `Answer: ${a}`,
     positive: [
-      { emoji: '🎉', text: 'Awesome' },
-      { emoji: '🌟', text: 'Superstar' },
-      { emoji: '🦸', text: 'Math Hero' },
-      { emoji: '🚀', text: 'Brilliant' },
-      { emoji: '🏆', text: 'Champion' },
+      { emoji: '🎉', text: 'Well done' },
+      { emoji: '🌟', text: 'Nice work' },
+      { emoji: '👍', text: 'Good job' },
+      { emoji: '🚀', text: 'Correct' },
+      { emoji: '✅', text: 'That\'s right' },
       { emoji: '💪', text: 'You got it' },
-      { emoji: '🎯', text: 'Perfect' },
-      { emoji: '🔥', text: 'On Fire' },
-      { emoji: '✨', text: 'Magical' },
+      { emoji: '🎯', text: 'Spot on' },
+      { emoji: '😊', text: 'Great' },
+      { emoji: '✨', text: 'Nailed it' },
     ],
     negative: [
       { emoji: '💪', text: 'Keep trying!' },
@@ -1022,40 +1114,47 @@ const I18N = {
     playerCustom: 'שחקן',
     showClues: 'הצג רמזים',
     revealClue: '💡 רמז',
-    perfect: (name, g) => g === 'f' ? `!🌟 ,מושלמת ${name}` : `!🌟 ,מושלם ${name}`,
-    outstanding: (name, g) => g === 'f' ? `!🏆 ,מצוינת ${name}` : `!🏆 ,מצוין ${name}`,
-    greatJob: (name, g) => `!🎉 ,כל הכבוד ${name}`,
-    goodEffort: (name, g) => `!😊 ,מאמץ טוב ${name}`,
-    keepPracticing: (name, g) => g === 'f' ? `!💪 ,המשיכי להתאמן ${name}` : `!💪 ,המשך להתאמן ${name}`,
+    perfect: (name, g) => `🌟 ,ציון מלא ${name}!`,
+    outstanding: (name, g) => g === 'f' ? `🏆 ,יפה מאוד ${name}!` : `🏆 ,יפה מאוד ${name}!`,
+    greatJob: (name, g) => `🎉 ,כל הכבוד ${name}!`,
+    goodEffort: (name, g) => `😊 ,מאמץ יפה ${name}!`,
+    keepPracticing: (name, g) => g === 'f' ? `💪 ,המשיכי לתרגל ${name}!` : `💪 ,המשך לתרגל ${name}!`,
     resultMsgPerfect: (name, g) => g === 'f'
-      ? `!${name}, את גאונית במתמטיקה! ציון מושלם`
-      : `!${name}, אתה גאון במתמטיקה! ציון מושלם`,
+      ? `${name}, ענית נכון על הכל!`
+      : `${name}, ענית נכון על הכל!`,
     resultMsgTop: (name, g) => g === 'f'
-      ? `!${name}, את קוסמת במתמטיקה! ציון כמעט מושלם`
-      : `!${name}, אתה קוסם במתמטיקה! ציון כמעט מושלם`,
+      ? `${name}, כמעט ציון מלא — ממש טוב!`
+      : `${name}, כמעט ציון מלא — ממש טוב!`,
     resultMsgGood: (name, g) => g === 'f'
-      ? `!באמת מצוינת, ${name}! המשיכי כך`
-      : `!באמת מצוין, ${name}! המשך כך`,
+      ? `עבודה טובה, ${name}! את מתקדמת.`
+      : `עבודה טובה, ${name}! אתה מתקדם.`,
     resultMsgOk: (name, g) => g === 'f'
-      ? `!ניסיון טוב, ${name}! עוד קצת תרגול ותהיי מקצוענית`
-      : `!ניסיון טוב, ${name}! עוד קצת תרגול ותהיה מקצוען`,
+      ? `לא רע, ${name}. עוד קצת תרגול יעזור!`
+      : `לא רע, ${name}. עוד קצת תרגול יעזור!`,
     resultMsgLow: (name, g) => g === 'f'
-      ? `!אל תדאגי ${name}, תרגול עושה מושלם! נסי שוב`
-      : `!אל תדאג ${name}, תרגול עושה מושלם! נסה שוב`,
+      ? `המשיכי לתרגל, ${name} — תרגול עושה שיפור!`
+      : `המשך לתרגל, ${name} — תרגול עושה שיפור!`,
     levelUp: (name, g) => g === 'f' ? `!${name} ,עלית שלב` : `!${name} ,עלית שלב`,
     maxNumberTo: n => `מספר מקסימלי → ${n}`,
     addedOp: op => `${op} נוסף`,
+    levelUpPromptTitle: '?מוכנים לאתגר',
+    levelUpPromptIntro: (name, g) => g === 'f'
+      ? `סיבוב מצוין, ${name}! נראה שאת מוכנה לשלב הבא.`
+      : `סיבוב מצוין, ${name}! נראה שאתה מוכן לשלב הבא.`,
+    levelUpPromptChanges: ':הנה מה שישתנה',
+    levelUpAccept: '🚀 !עולים שלב',
+    levelUpDecline: 'נשאר באותו שלב',
     answer: a => `${a} :תשובה`,
     positive: [
-      { emoji: '🎉', m: 'מדהים', f: 'מדהימה' },
-      { emoji: '🌟', m: 'סופרסטאר', f: 'סופרסטארית' },
-      { emoji: '🦸', m: 'גיבור מתמטיקה', f: 'גיבורת מתמטיקה' },
-      { emoji: '🚀', m: 'מבריק', f: 'מבריקה' },
-      { emoji: '🏆', m: 'אלוף', f: 'אלופה' },
+      { emoji: '🎉', m: 'כל הכבוד', f: 'כל הכבוד' },
+      { emoji: '🌟', m: 'יפה מאוד', f: 'יפה מאוד' },
+      { emoji: '👍', m: 'עבודה טובה', f: 'עבודה טובה' },
+      { emoji: '🚀', m: 'נכון', f: 'נכון' },
+      { emoji: '✅', m: 'בדיוק', f: 'בדיוק' },
       { emoji: '💪', m: 'הצלחת', f: 'הצלחת' },
-      { emoji: '🎯', m: 'מושלם', f: 'מושלמת' },
-      { emoji: '🔥', m: 'בוער', f: 'בוערת' },
-      { emoji: '✨', m: 'קסום', f: 'קסומה' },
+      { emoji: '🎯', m: 'בול', f: 'בול' },
+      { emoji: '😊', m: 'יופי', f: 'יופי' },
+      { emoji: '✨', m: 'מצוין', f: 'מצוינת' },
     ],
     negative: [
       { emoji: '💪', m: '!המשך לנסות', f: '!המשיכי לנסות' },
@@ -1454,36 +1553,14 @@ function showResults() {
   $('resultsMessage').textContent = msg;
 
   const banner = $('levelUpBanner');
+  banner.classList.add('hidden');
+
   if (score >= 9) {
-    banner.classList.remove('hidden');
-    let changes = [];
-    settings.operations.forEach(o => {
-      if (o.max < 50) {
-        o.max += 2;
-        const row = document.querySelector(`.op-row[data-op="${o.op}"]`);
-        if (row) row.querySelector('.op-max-input').value = o.max;
-        changes.push(t('maxNumberTo')(o.max));
-      }
-    });
-    if (settings.operations.length < 4 && score === 10) {
-      const allOps = ['add', 'subtract', 'multiply', 'divide'];
-      const active = settings.operations.map(o => o.op);
-      const missing = allOps.filter(o => !active.includes(o));
-      if (missing.length > 0) {
-        const newOp = missing[0];
-        const row = document.querySelector(`.op-row[data-op="${newOp}"]`);
-        if (row) {
-          row.querySelector('.op-check').checked = true;
-          row.classList.add('enabled');
-        }
-        settings.operations.push({ op: newOp, max: parseInt(row?.querySelector('.op-max-input').value) || 12 });
-        changes.push(t('addedOp')(t('opNames')[newOp]));
-      }
+    const pendingChanges = computeLevelUpChanges(score);
+    if (pendingChanges.length > 0) {
+      showLevelUpPrompt(playerName, g, pendingChanges);
     }
-    $('levelUpText').textContent = t('levelUp')(playerName, g) + ' ' + changes.join(' • ');
     launchConfetti();
-  } else {
-    banner.classList.add('hidden');
   }
 
   const rowsEl = $('resultsRows');
@@ -1501,6 +1578,87 @@ function showResults() {
   });
 
   if (pct >= 0.7) launchConfetti();
+}
+
+// ==================== LEVEL-UP PROMPT ====================
+function computeLevelUpChanges(score) {
+  const changes = [];
+  settings.operations.forEach(o => {
+    if (o.max < 50) {
+      changes.push({ type: 'maxUp', op: o.op, from: o.max, to: o.max + 2 });
+    }
+  });
+  if (settings.operations.length < 4 && score === 10) {
+    const allOps = ['add', 'subtract', 'multiply', 'divide'];
+    const active = settings.operations.map(o => o.op);
+    const missing = allOps.filter(o => !active.includes(o));
+    if (missing.length > 0) {
+      const newOp = missing[0];
+      const row = document.querySelector(`.op-row[data-op="${newOp}"]`);
+      const max = parseInt(row?.querySelector('.op-max-input').value) || 12;
+      changes.push({ type: 'addOp', op: newOp, max });
+    }
+  }
+  return changes;
+}
+
+function showLevelUpPrompt(playerName, g, pendingChanges) {
+  $('lupTitle').textContent = t('levelUpPromptTitle');
+  const introFn = t('levelUpPromptIntro');
+  $('lupIntro').textContent = typeof introFn === 'function' ? introFn(playerName, g) : introFn;
+  $('lupChangesLabel').textContent = t('levelUpPromptChanges');
+
+  const list = $('lupChangesList');
+  list.innerHTML = '';
+  pendingChanges.forEach(c => {
+    const li = document.createElement('li');
+    if (c.type === 'maxUp') {
+      li.textContent = `${t('opNames')[c.op]}: ${t('maxNumberTo')(c.to)}`;
+    } else if (c.type === 'addOp') {
+      li.textContent = t('addedOp')(t('opNames')[c.op]);
+    }
+    list.appendChild(li);
+  });
+
+  $('lupAccept').textContent = t('levelUpAccept');
+  $('lupDecline').textContent = t('levelUpDecline');
+
+  $('levelUpOverlay').classList.remove('hidden');
+
+  $('lupAccept').onclick = () => {
+    applyLevelUpChanges(pendingChanges, playerName, g);
+    $('levelUpOverlay').classList.add('hidden');
+  };
+  $('lupDecline').onclick = () => {
+    $('levelUpOverlay').classList.add('hidden');
+  };
+}
+
+function applyLevelUpChanges(changes, playerName, g) {
+  const descriptions = [];
+  changes.forEach(c => {
+    if (c.type === 'maxUp') {
+      const op = settings.operations.find(o => o.op === c.op);
+      if (op) {
+        op.max = c.to;
+        const row = document.querySelector(`.op-row[data-op="${c.op}"]`);
+        if (row) row.querySelector('.op-max-input').value = c.to;
+      }
+      descriptions.push(t('maxNumberTo')(c.to));
+    } else if (c.type === 'addOp') {
+      const row = document.querySelector(`.op-row[data-op="${c.op}"]`);
+      if (row) {
+        row.querySelector('.op-check').checked = true;
+        row.classList.add('enabled');
+      }
+      settings.operations.push({ op: c.op, max: c.max });
+      descriptions.push(t('addedOp')(t('opNames')[c.op]));
+    }
+  });
+
+  const banner = $('levelUpBanner');
+  banner.classList.remove('hidden');
+  $('levelUpText').textContent = t('levelUp')(playerName, g) + ' ' + descriptions.join(' • ');
 }
 
 // ==================== CONFETTI ====================
