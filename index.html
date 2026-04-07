@@ -1048,16 +1048,16 @@ const I18N = {
     playerCustom: 'Player',
     showClues: 'Show clues',
     revealClue: '💡 Clue',
-    perfect: name => `Perfect score, ${name}! 🌟`,
-    outstanding: name => `Well done, ${name}! 🏆`,
-    greatJob: name => `Good job, ${name}! 🎉`,
-    goodEffort: name => `Nice effort, ${name}! 😊`,
-    keepPracticing: name => `Keep practicing, ${name}! 💪`,
-    resultMsgPerfect: name => `${name}, you got every single one right!`,
-    resultMsgTop: name => `${name}, almost a perfect score — really solid!`,
-    resultMsgGood: name => `Good work, ${name}! You're making progress.`,
-    resultMsgOk: name => `Not bad, ${name}. A bit more practice will help!`,
-    resultMsgLow: name => `Keep at it, ${name} — practice makes progress!`,
+    perfect: name => `Full score, ${name}! 🌟`,
+    outstanding: name => `Strong effort, ${name}! 💪`,
+    greatJob: name => `Making progress, ${name}! 📈`,
+    goodEffort: name => `Keep it up, ${name}! ✏️`,
+    keepPracticing: name => `Don't stop, ${name}! 🔄`,
+    resultMsgPerfect: name => `${name}, all that practice paid off — every answer correct.`,
+    resultMsgTop: name => `${name}, your persistence shows — almost all correct.`,
+    resultMsgGood: name => `${name}, you're getting better with each round. Keep going.`,
+    resultMsgOk: name => `${name}, every mistake is a chance to learn. Try again!`,
+    resultMsgLow: name => `${name}, the more you practice the stronger you get. Don't give up!`,
     levelUp: name => `LEVEL UP, ${name}!`,
     maxNumberTo: n => `Max number → ${n}`,
     addedOp: op => `Added ${op}`,
@@ -1068,23 +1068,23 @@ const I18N = {
     levelUpDecline: 'Stay at this level',
     answer: a => `Answer: ${a}`,
     positive: [
-      { emoji: '🎉', text: 'Well done' },
-      { emoji: '🌟', text: 'Nice work' },
-      { emoji: '👍', text: 'Good job' },
-      { emoji: '🚀', text: 'Correct' },
-      { emoji: '✅', text: 'That\'s right' },
-      { emoji: '💪', text: 'You got it' },
+      { emoji: '👍', text: 'That\'s right' },
+      { emoji: '✅', text: 'Correct' },
       { emoji: '🎯', text: 'Spot on' },
-      { emoji: '😊', text: 'Great' },
-      { emoji: '✨', text: 'Nailed it' },
+      { emoji: '💪', text: 'Your effort pays off' },
+      { emoji: '📈', text: 'You\'re improving' },
+      { emoji: '🧠', text: 'Good thinking' },
+      { emoji: '✏️', text: 'Practice works' },
+      { emoji: '😊', text: 'Nice' },
+      { emoji: '🪜', text: 'One step closer' },
     ],
     negative: [
-      { emoji: '💪', text: 'Keep trying!' },
-      { emoji: '🌈', text: 'Almost there!' },
-      { emoji: '🐢', text: 'Slow & steady!' },
-      { emoji: '🤗', text: "You'll get it!" },
-      { emoji: '🌻', text: "Don't give up!" },
-      { emoji: '🦋', text: 'Next time!' },
+      { emoji: '💪', text: 'Keep going' },
+      { emoji: '🧠', text: 'Think it through' },
+      { emoji: '🪜', text: 'Step by step' },
+      { emoji: '📈', text: 'Each try helps' },
+      { emoji: '✏️', text: 'Try again' },
+      { emoji: '🔄', text: 'Don\'t stop now' },
     ],
     opNames: { add: 'Addition', subtract: 'Subtraction', multiply: 'Multiplication', divide: 'Division' },
   },
@@ -1115,25 +1115,31 @@ const I18N = {
     showClues: 'הצג רמזים',
     revealClue: '💡 רמז',
     perfect: (name, g) => `🌟 ,ציון מלא ${name}!`,
-    outstanding: (name, g) => g === 'f' ? `🏆 ,יפה מאוד ${name}!` : `🏆 ,יפה מאוד ${name}!`,
-    greatJob: (name, g) => `🎉 ,כל הכבוד ${name}!`,
-    goodEffort: (name, g) => `😊 ,מאמץ יפה ${name}!`,
-    keepPracticing: (name, g) => g === 'f' ? `💪 ,המשיכי לתרגל ${name}!` : `💪 ,המשך לתרגל ${name}!`,
+    outstanding: (name, g) => `💪 ,מאמץ חזק ${name}!`,
+    greatJob: (name, g) => g === 'f'
+      ? `📈 ,את מתקדמת ${name}!`
+      : `📈 ,אתה מתקדם ${name}!`,
+    goodEffort: (name, g) => g === 'f'
+      ? `✏️ ,המשיכי ככה ${name}!`
+      : `✏️ ,המשך ככה ${name}!`,
+    keepPracticing: (name, g) => g === 'f'
+      ? `🔄 ,אל תעצרי ${name}!`
+      : `🔄 ,אל תעצור ${name}!`,
     resultMsgPerfect: (name, g) => g === 'f'
-      ? `${name}, ענית נכון על הכל!`
-      : `${name}, ענית נכון על הכל!`,
+      ? `${name}, כל התרגול השתלם — ענית נכון על הכל.`
+      : `${name}, כל התרגול השתלם — ענית נכון על הכל.`,
     resultMsgTop: (name, g) => g === 'f'
-      ? `${name}, כמעט ציון מלא — ממש טוב!`
-      : `${name}, כמעט ציון מלא — ממש טוב!`,
+      ? `${name}, ההתמדה שלך ניכרת — כמעט הכל נכון.`
+      : `${name}, ההתמדה שלך ניכרת — כמעט הכל נכון.`,
     resultMsgGood: (name, g) => g === 'f'
-      ? `עבודה טובה, ${name}! את מתקדמת.`
-      : `עבודה טובה, ${name}! אתה מתקדם.`,
+      ? `${name}, את משתפרת עם כל סיבוב. המשיכי.`
+      : `${name}, אתה משתפר עם כל סיבוב. המשך.`,
     resultMsgOk: (name, g) => g === 'f'
-      ? `לא רע, ${name}. עוד קצת תרגול יעזור!`
-      : `לא רע, ${name}. עוד קצת תרגול יעזור!`,
+      ? `${name}, כל טעות היא הזדמנות ללמוד. נסי שוב!`
+      : `${name}, כל טעות היא הזדמנות ללמוד. נסה שוב!`,
     resultMsgLow: (name, g) => g === 'f'
-      ? `המשיכי לתרגל, ${name} — תרגול עושה שיפור!`
-      : `המשך לתרגל, ${name} — תרגול עושה שיפור!`,
+      ? `${name}, ככל שתתרגלי יותר תתחזקי. אל תוותרי!`
+      : `${name}, ככל שתתרגל יותר תתחזק. אל תוותר!`,
     levelUp: (name, g) => g === 'f' ? `!${name} ,עלית שלב` : `!${name} ,עלית שלב`,
     maxNumberTo: n => `מספר מקסימלי → ${n}`,
     addedOp: op => `${op} נוסף`,
@@ -1146,23 +1152,23 @@ const I18N = {
     levelUpDecline: 'נשאר באותו שלב',
     answer: a => `${a} :תשובה`,
     positive: [
-      { emoji: '🎉', m: 'כל הכבוד', f: 'כל הכבוד' },
-      { emoji: '🌟', m: 'יפה מאוד', f: 'יפה מאוד' },
-      { emoji: '👍', m: 'עבודה טובה', f: 'עבודה טובה' },
-      { emoji: '🚀', m: 'נכון', f: 'נכון' },
+      { emoji: '👍', m: 'נכון', f: 'נכון' },
       { emoji: '✅', m: 'בדיוק', f: 'בדיוק' },
-      { emoji: '💪', m: 'הצלחת', f: 'הצלחת' },
       { emoji: '🎯', m: 'בול', f: 'בול' },
-      { emoji: '😊', m: 'יופי', f: 'יופי' },
-      { emoji: '✨', m: 'מצוין', f: 'מצוינת' },
+      { emoji: '💪', m: 'המאמץ משתלם', f: 'המאמץ משתלם' },
+      { emoji: '📈', m: 'את משתפר', f: 'את משתפרת' },
+      { emoji: '🧠', m: 'חשיבה טובה', f: 'חשיבה טובה' },
+      { emoji: '✏️', m: 'התרגול עובד', f: 'התרגול עובד' },
+      { emoji: '😊', m: 'יפה', f: 'יפה' },
+      { emoji: '🪜', m: 'צעד קדימה', f: 'צעד קדימה' },
     ],
     negative: [
-      { emoji: '💪', m: '!המשך לנסות', f: '!המשיכי לנסות' },
-      { emoji: '🌈', m: '!כמעט שם', f: '!כמעט שם' },
-      { emoji: '🐢', m: '!לאט ובטוח', f: '!לאט ובטוח' },
-      { emoji: '🤗', m: '!תצליח', f: '!תצליחי' },
-      { emoji: '🌻', m: '!אל תוותר', f: '!אל תוותרי' },
-      { emoji: '🦋', m: '!בפעם הבאה', f: '!בפעם הבאה' },
+      { emoji: '💪', m: '!המשך', f: '!המשיכי' },
+      { emoji: '🧠', m: '!תחשוב שוב', f: '!תחשבי שוב' },
+      { emoji: '🪜', m: '!צעד אחר צעד', f: '!צעד אחר צעד' },
+      { emoji: '📈', m: '!כל ניסיון מקדם', f: '!כל ניסיון מקדם' },
+      { emoji: '✏️', m: '!נסה שוב', f: '!נסי שוב' },
+      { emoji: '🔄', m: '!אל תעצור עכשיו', f: '!אל תעצרי עכשיו' },
     ],
     opNames: { add: 'חיבור', subtract: 'חיסור', multiply: 'כפל', divide: 'חילוק' },
   }
